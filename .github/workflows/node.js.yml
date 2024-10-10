@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]  # Ensure this matches your branch name (either 'main' or 'master')
+    branches: [ "master" ]  # Ensure this matches your branch name (either 'main' or 'master')
   pull_request:
-    branches: [ "main" ]  # Ensure this matches your branch name (either 'main' or 'master')
+    branches: [ "master" ]  # Ensure this matches your branch name (either 'main' or 'master')
 
 jobs:
   deploy:
@@ -34,7 +34,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}   # Make sure this secret is set up in GitHub Secrets (e.g., 'ubuntu')
         key: ${{ secrets.EC2_SSH_KEY }}    # Make sure this secret is set up in GitHub Secrets (EC2 private key)
         script: |
-          cd /path/to/your/project          # Replace with your actual project directory on the EC2 instance
+          cd /home/ec2-user/CI-CD-practice          # Replace with your actual project directory on the EC2 instance
           git pull origin main              # Pull the latest changes from the 'main' branch (or 'master' if you use that)
           npm install                       # Install dependencies (if any new ones were added)
           pm2 restart all                   # Restart the server using PM2 (adjust if you use a different process manager)
