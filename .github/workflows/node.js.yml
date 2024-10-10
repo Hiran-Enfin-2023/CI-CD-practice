@@ -1,13 +1,10 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]  # Ensure this matches your branch name (either 'main' or 'master')
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]  # Ensure this matches your branch name (either 'main' or 'master')
 
 jobs:
   deploy:
@@ -15,17 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the latest code from the repository
+    # Step 1: Checkout the latest code from the repository (use v3)
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # Updated to the latest version
 
-    # Step 2: Set up Node.js on the GitHub runner (to install dependencies if needed)
+    # Step 2: Set up Node.js on the GitHub runner (updated to v3 for node setup)
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3  # Updated to the latest version
       with:
         node-version: '18'  # Specify the Node.js version to use
 
-    # Step 3: Install the project's dependencies
+    # Step 3: Install the project's dependencies locally on the GitHub runner (optional)
     - name: Install dependencies
       run: npm install
 
@@ -33,11 +30,11 @@ jobs:
     - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@v0.1.5
       with:
-        host: ${{ secrets.EC2_HOST }}       # Add your EC2 public IP or domain to GitHub Secrets
-        username: ${{ secrets.EC2_USER }}   # Add your EC2 username (e.g., 'ubuntu' or 'ec2-user') to GitHub Secrets
-        key: ${{ secrets.EC2_SSH_KEY }}    # Add your EC2 private SSH key as a GitHub Secret
+        host: ${{ secrets.EC2_HOST }}       # Make sure this secret is set up in GitHub Secrets (EC2 public IP)
+        username: ${{ secrets.EC2_USER }}   # Make sure this secret is set up in GitHub Secrets (e.g., 'ubuntu')
+        key: ${{ secrets.EC2_SSH_KEY }}    # Make sure this secret is set up in GitHub Secrets (EC2 private key)
         script: |
-          cd /CI-CD-practice              # Navigate to your project folder on EC2
-          git pull origin main                  # Pull the latest changes
-          npm install                           # Install dependencies (if any new ones were added)
-          pm2 restart all    
+          cd /path/to/your/project          # Replace with your actual project directory on the EC2 instance
+          git pull origin main              # Pull the latest changes from the 'main' branch (or 'master' if you use that)
+          npm install                       # Install dependencies (if any new ones were added)
+          pm2 restart all                   # Restart the server using PM2 (adjust if you use a different process manager)
