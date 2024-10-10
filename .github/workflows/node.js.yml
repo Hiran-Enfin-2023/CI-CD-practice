@@ -1,0 +1,43 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the latest code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step 2: Set up Node.js on the GitHub runner (to install dependencies if needed)
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'  # Specify the Node.js version to use
+
+    # Step 3: Install the project's dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Step 4: SSH into your EC2 instance and deploy the latest changes
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}       # Add your EC2 public IP or domain to GitHub Secrets
+        username: ${{ secrets.EC2_USER }}   # Add your EC2 username (e.g., 'ubuntu' or 'ec2-user') to GitHub Secrets
+        key: ${{ secrets.EC2_SSH_KEY }}    # Add your EC2 private SSH key as a GitHub Secret
+        script: |
+          cd /CI-CD-practice              # Navigate to your project folder on EC2
+          git pull origin main                  # Pull the latest changes
+          npm install                           # Install dependencies (if any new ones were added)
+          pm2 restart all    
