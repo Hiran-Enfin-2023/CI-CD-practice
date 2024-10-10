@@ -7,6 +7,15 @@ app.get('/',(req,res)=>{
     res.send('Hello CI-CD');
 })
 
+app.post('/hello',(req,res)=>{
+    const {name, email} = req.body;
+
+    res.send({
+        name:name,
+        email:email
+    })
+})
+
 
 app.listen(3000,()=>{
     console.log('Port listening on 3000')
