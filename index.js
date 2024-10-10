@@ -10,6 +10,10 @@ app.get('/',(req,res)=>{
 app.post('/hello',(req,res)=>{
     const {name, email} = req.body;
 
+    if(!name || !email){
+        return "please enter details"
+    }
+
     res.send({
         name:name,
         email:email
