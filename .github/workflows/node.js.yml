@@ -2,39 +2,34 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]  # Ensure this matches your branch name (either 'main' or 'master')
+    branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]  # Ensure this matches your branch name (either 'main' or 'master')
+    branches: [ "master" ]
 
 jobs:
   deploy:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the latest code from the repository (use v3)
     - name: Checkout code
-      uses: actions/checkout@v3  # Updated to the latest version
+      uses: actions/checkout@v4
 
-    # Step 2: Set up Node.js on the GitHub runner (updated to v3 for node setup)
     - name: Set up Node.js
-      uses: actions/setup-node@v3  # Updated to the latest version
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'  # Specify the Node.js version to use
+        node-version: '20'
 
-    # Step 3: Install the project's dependencies locally on the GitHub runner (optional)
     - name: Install dependencies
       run: npm install
 
-    # Step 4: SSH into your EC2 instance and deploy the latest changes
     - name: Deploy to EC2 via SSH
-      uses: appleboy/ssh-action@v0.1.5
+      uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ secrets.EC2_HOST }}       # Make sure this secret is set up in GitHub Secrets (EC2 public IP)
-        username: ${{ secrets.EC2_USER }}   # Make sure this secret is set up in GitHub Secrets (e.g., 'ubuntu')
-        key: ${{ secrets.EC2_SSH_KEY }}    # Make sure this secret is set up in GitHub Secrets (EC2 private key)
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd /home/ec2-user/CI-CD-practice          # Replace with your actual project directory on the EC2 instance
-          git pull origin main              # Pull the latest changes from the 'main' branch (or 'master' if you use that)
-          npm install                       # Install dependencies (if any new ones were added)
-          pm2 restart all                   # Restart the server using PM2 (adjust if you use a different process manager)
+          cd /home/ec2-user/CI-CD-practice
+          git pull origin master
+          npm install
+          pm2 restart all
